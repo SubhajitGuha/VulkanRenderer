@@ -1,19 +1,29 @@
 
 #include "application.hpp"
 #include "Window/window.hpp"
+#include "glm/glm.hpp"
 
 using namespace Engine;
 
 Application::Application(){
     
+    m_camera = Camera::GetCamera(CameraType::SCENE_CAMERA);
+    m_camera->SetCameraPosition({0.0,0.0,-10});
     vulkan_renderer = std::make_shared<Vulkan>();
     vulkan_renderer->Init();
     
     m_numImages = vulkan_renderer->GetNumSwapChainImages();
     m_cmdBuffers.resize(m_numImages);
+    m_cameraProjViewBuffer.resize(m_numImages);
     
     vulkan_renderer->CreateCommandBuffer(m_numImages, m_cmdBuffers.data());
+    CreateDescriptorSets(vulkan_renderer->GetDevice());
+    
+    m_pipeline = std::make_shared<VulkanPipeline>();
+    m_pipeline->CreatePipelineLayout(vulkan_renderer->GetDevice(), {m_descSetLayout});
+    m_pipeline->CreatePipeline(vulkan_renderer->GetDevice(), vulkan_renderer->GetRenderPass());
     RecordCommandBuffer();
+
 }
 Application::~Application(){
     
@@ -34,7 +44,9 @@ void Application::RecordCommandBuffer()
     {
         vulkan_renderer->BeginCommandBuffer(m_cmdBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
         vulkan_renderer->BeginRenderPass(m_cmdBuffers[i], i, clearVal);
-        vkCmdBindPipeline(m_cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vulkan_renderer->GetPipeline());
+        
+        vkCmdBindPipeline(m_cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->GetPipeline());
+        vkCmdBindDescriptorSets(m_cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->GetPipelineLayout(), 0, 1, &m_descriptorSets[i], 0, nullptr);
         
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(m_cmdBuffers[i], 0, 1, vulkan_renderer->GetBuffer(), &offset);
@@ -60,16 +72,93 @@ void Application::RecordCommandBuffer()
     std::cout<<"command buffers recorded\n";
 }
 
+void Application::CreateDescriptorSets(VkDevice& m_device)
+{
+    VkDescriptorSetLayoutBinding dsLayoutBinding{};
+    dsLayoutBinding.binding = 0;
+    dsLayoutBinding.descriptorCount = 1;
+    dsLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    dsLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //use it from the vertex shader
+    
+    VkDescriptorSetLayoutCreateInfo dsLayoutInfo{};
+    dsLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    dsLayoutInfo.pNext = nullptr;
+    dsLayoutInfo.flags = 0;
+    dsLayoutInfo.bindingCount = 1;
+    dsLayoutInfo.pBindings = &dsLayoutBinding;
+    
+    auto res = vkCreateDescriptorSetLayout(m_device, &dsLayoutInfo, nullptr, &m_descSetLayout);
+    
+    if (res == VK_SUCCESS)
+        std::cout<<"Descriptor set Created!!"<<std::endl;
+    else
+        std::cout<<"Failed to create Descriptor Set ERROR code:- "<< res<<std::endl;
+    
+    //create a descriptor pool that will hold 10 uniform buffers
+    std::vector<VkDescriptorPoolSize> sizes = {
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10}
+    };
+    
+    VkDescriptorPoolCreateInfo dpInfo{};
+    dpInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    dpInfo.flags = 0;
+    dpInfo.maxSets = 10;
+    dpInfo.pPoolSizes = sizes.data();
+    dpInfo.poolSizeCount = (uint32_t)sizes.size();
+    
+    vkCreateDescriptorPool(m_device, &dpInfo, nullptr, &m_descriptorPool);
+    
+    //create descriptor sets for each image in the swap chain.
+    m_descriptorSets.resize(m_numImages);
+    for (int i=0; i< m_descriptorSets.size(); i++){
+        //create the camera buffers for every images
+        m_cameraProjViewBuffer[i].CreateBuffer(m_device, vulkan_renderer->GetAllocator(), sizeof(glm::mat4x4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+        
+        VkDescriptorSetAllocateInfo dsAllocInfo{};
+        dsAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        dsAllocInfo.pNext = nullptr;
+        dsAllocInfo.descriptorPool = m_descriptorPool;
+        dsAllocInfo.descriptorSetCount = 1;
+        dsAllocInfo.pSetLayouts = &m_descSetLayout;
+        
+        vkAllocateDescriptorSets(m_device, &dsAllocInfo, &m_descriptorSets[i]);
+        
+        VkDescriptorBufferInfo descBufferInfo{};
+        descBufferInfo.buffer =  *m_cameraProjViewBuffer[i].GetBuffer();
+        descBufferInfo.offset = 0;
+        descBufferInfo.range = sizeof(glm::mat4x4);
+        
+        VkWriteDescriptorSet writeSet{};
+        writeSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writeSet.pNext = nullptr;
+        writeSet.descriptorCount  = 1; //here the descriptor count is the number of elemnts in "pBufferInfo" array.
+        writeSet.dstSet = m_descriptorSets[i];
+        writeSet.dstBinding = 0;
+        writeSet.pBufferInfo = &descBufferInfo;
+        writeSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        
+        vkUpdateDescriptorSets(m_device, 1, &writeSet, 0, nullptr);
+    }
+}
 void Application::Run(){
     auto window = vulkan_renderer->GetWindow();
     while(!window->is_windowClosd())
     {
         window->update();
+        m_camera->OnUpdate();
         uint32_t imgIndex = vulkan_renderer->AcquireNextImage();
+        
+        glm::mat4x4 projViewMat = m_camera->GetProjectionView(); //get projection view matrix
+        m_cameraProjViewBuffer[imgIndex].CopyBuffer(vulkan_renderer->GetAllocator(), &projViewMat[0][0], sizeof(glm::mat4x4)); //update the vulkan buffer
+        
         vulkan_renderer->SubmitAsync(m_cmdBuffers[imgIndex]);
         vulkan_renderer->Present(imgIndex);
         vkQueueWaitIdle(vulkan_renderer->GetQueue());
 
     }
     vkDeviceWaitIdle(vulkan_renderer->GetDevice());
+    for (auto val: m_cameraProjViewBuffer)
+    {
+        val.DestroyBuffer(vulkan_renderer->GetAllocator());
+    }
 }

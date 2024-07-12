@@ -5,6 +5,7 @@
 
 namespace Engine 
 {
+    std::vector<VkDescriptorSetLayout> Vulkan::m_descriptorSetLayouts;
     static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
         VkDebugUtilsMessageTypeFlagsEXT Type,
@@ -42,8 +43,13 @@ namespace Engine
             std::cout<< extensions[i]<<std::endl;
             requiredExtensions.emplace_back(extensions[i]);
         }
-        m_pipeline = std::make_shared<VulkanPipeline>();
-        m_buffer = std::make_shared<VulkanBuffer>();
+        //create the vertex buffer (triangle position and color val)
+        vertices = {
+            {{2.0,-0.5,0.0,10.0}, {1.0,0.0,0.0,1.0}},
+            {{0.5,0.0,0.0,1.0}, {0.0,1.0,0.0,1.0}},
+            {{-0.5,0.0,0.0,-10.0}, {0.0,0.0,1.0,1.0}},
+        };
+        m_vertex_buffer = std::make_shared<VulkanBuffer>();
         
         CreateInstance(requiredExtensions);
 //        CreateDebugCallback();
@@ -56,7 +62,7 @@ namespace Engine
         CreateCommandBufferPool();
         CreateRenderPass();
         CreateFrameBuffers();
-        CreateGraphicsPipeline();
+//        CreateGraphicsPipeline();
         CreateQueue();
         CreateSemaphores(&m_presentCompleateSemaphore);
         CreateSemaphores(&m_renderCompleateSemaphore);
@@ -529,10 +535,10 @@ namespace Engine
     }
 
     void Vulkan::CreateGraphicsPipeline(){
-        m_pipeline->CreatePipeline(m_device, m_renderPass);
     }
     void Vulkan::CreateVertexBuffer(){
-        m_buffer->CreateVertexBuffer(m_device, m_vmaAllocator);
+        m_vertex_buffer->CreateBuffer(m_device, m_vmaAllocator, sizeof(Vertex) * vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+        m_vertex_buffer->CopyBuffer(m_vmaAllocator, vertices.data(), sizeof(Vertex) * vertices.size());
     }
 
     uint32_t Vulkan::AcquireNextImage(){
@@ -600,7 +606,7 @@ namespace Engine
 //                exit(1);
 //            }
 //        vkDestroyDebugUtilsMessenger(VulkanInstance, m_debugMessanger, NULL);
-        m_buffer->DestroyVertexBuffer(m_vmaAllocator);
+        m_vertex_buffer->DestroyBuffer(m_vmaAllocator);
         vkDestroySemaphore(m_device, m_presentCompleateSemaphore, nullptr);
         vkDestroySemaphore(m_device, m_renderCompleateSemaphore, nullptr);
         vkDestroyFence(m_device, m_inFlightFence, nullptr);
@@ -609,7 +615,6 @@ namespace Engine
         {
             vkDestroyFramebuffer(m_device, m_swapChainFramebuffers[i], nullptr);
         }
-        m_pipeline->CleanUp(m_device);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         for (int i=0; i<m_imageViews.size(); i++)
         {

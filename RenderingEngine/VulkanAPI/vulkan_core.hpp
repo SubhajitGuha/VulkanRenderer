@@ -31,10 +31,14 @@ namespace Engine
         inline VkImage GetImage(uint32_t index){return m_images[index];}
         //Gives the swapchain Image Extent
         inline VkExtent2D GetImageExtent() {return m_swapChainImageExtent;}
-        inline VkPipeline GetPipeline() {return m_pipeline->GetPipeline();}
-        inline VkDevice GetDevice() {return m_device;}
-        inline VkBuffer* GetBuffer() {return m_buffer->GetBuffer();}
+//        inline VkPipeline GetPipeline() {return m_pipeline->GetPipeline();}
+//        inline VkPipelineLayout GetPipelineLayout() {return m_pipeline->GetPipelineLayout();}
+        inline VkDevice& GetDevice() {return m_device;}
+        inline VkBuffer* GetBuffer() {return m_vertex_buffer->GetBuffer();}
         inline VkQueue GetQueue() {return m_queue;}
+        inline VkRenderPass& GetRenderPass(){return m_renderPass;}
+        inline VmaAllocator& GetAllocator(){return m_vmaAllocator;}
+        inline static void AddDescriptorSetLayout(VkDescriptorSetLayout& layout){ m_descriptorSetLayouts.push_back(layout);}
         void CreateCommandBuffer(uint32_t count, VkCommandBuffer *cmdBuffer);
         void BeginCommandBuffer(VkCommandBuffer buffer, VkCommandBufferUsageFlags flags);
         void EndCommandBuffer(VkCommandBuffer buffer);
@@ -66,6 +70,8 @@ namespace Engine
         void CreateVertexBuffer();
     private:
         bool isDeviceSutable(VkPhysicalDevice& device);
+    public:
+        static std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;
     private:
         VkInstance VulkanInstance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT m_debugMessanger = VK_NULL_HANDLE;
@@ -79,10 +85,10 @@ namespace Engine
         VkFence m_inFlightFence;
         VkFormat m_surfaceImageFormat;
         VkExtent2D m_swapChainImageExtent;
-        std::shared_ptr<VulkanPipeline>  m_pipeline;
         VmaAllocator m_vmaAllocator;
-        std::shared_ptr<VulkanBuffer> m_buffer;
+        std::shared_ptr<VulkanBuffer> m_vertex_buffer;
         std::vector<VkFramebuffer> m_swapChainFramebuffers;
+        std::vector<Vertex> vertices;
 
         VulkanPhysicalDevices m_physicalDevices;
         std::vector<VkImage> m_images;

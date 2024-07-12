@@ -20,6 +20,8 @@
 		6F45E19B2BD54C050015A527 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F45E19A2BD54C050015A527 /* main.cpp */; };
 		6F6ACE802C1D932D00EFC8A4 /* vulkan_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F6ACE7E2C1D932D00EFC8A4 /* vulkan_core.cpp */; };
 		6F6ACE862C1EC54A00EFC8A4 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F6ACE842C1EC54A00EFC8A4 /* window.cpp */; };
+		6F83ABCA2C3FB3C200DEE087 /* SceneCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F83ABC82C3FB3C200DEE087 /* SceneCamera.cpp */; };
+		6F83ABD02C3FB4DA00DEE087 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F83ABCE2C3FB4DA00DEE087 /* Camera.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -65,6 +67,10 @@
 		6F6ACE822C1EA66700EFC8A4 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		6F6ACE842C1EC54A00EFC8A4 /* window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		6F6ACE852C1EC54A00EFC8A4 /* window.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = window.hpp; sourceTree = "<group>"; };
+		6F83ABC82C3FB3C200DEE087 /* SceneCamera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SceneCamera.cpp; sourceTree = "<group>"; };
+		6F83ABC92C3FB3C200DEE087 /* SceneCamera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SceneCamera.hpp; sourceTree = "<group>"; };
+		6F83ABCE2C3FB4DA00DEE087 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
+		6F83ABCF2C3FB4DA00DEE087 /* Camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Camera.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +172,10 @@
 		6F83ABC72C3FA62B00DEE087 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				6F83ABC82C3FB3C200DEE087 /* SceneCamera.cpp */,
+				6F83ABC92C3FB3C200DEE087 /* SceneCamera.hpp */,
+				6F83ABCE2C3FB4DA00DEE087 /* Camera.cpp */,
+				6F83ABCF2C3FB4DA00DEE087 /* Camera.hpp */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -231,9 +241,11 @@
 				6F6ACE862C1EC54A00EFC8A4 /* window.cpp in Sources */,
 				6F45E19B2BD54C050015A527 /* main.cpp in Sources */,
 				6F0548602C39234600FE5F3A /* vulkan_pipeline.cpp in Sources */,
+				6F83ABD02C3FB4DA00DEE087 /* Camera.cpp in Sources */,
 				6F6ACE802C1D932D00EFC8A4 /* vulkan_core.cpp in Sources */,
 				6F0548542C2FD79C00FE5F3A /* vulkan_physical_device.cpp in Sources */,
 				6F0548572C31C1B700FE5F3A /* application.cpp in Sources */,
+				6F83ABCA2C3FB3C200DEE087 /* SceneCamera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

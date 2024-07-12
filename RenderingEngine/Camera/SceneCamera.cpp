@@ -1,72 +1,124 @@
-#pragma once
-#include "Camera.h"
+#include "SceneCamera.hpp"
 
-namespace Hazel {
-    enum ProjectionTypes {
-        Orhtographic, perspective
-    };
+namespace Engine {
+    SceneCamera::SceneCamera(float Width, float Height)
+    {
+        SetViewportSize(Width/Height);
+    }
+    SceneCamera::SceneCamera()
+    {
+        RecalculateProjection();
+        RecalculateProjectionView();
+    }
+    void SceneCamera::SetPerspctive(float v_FOV, float Near, float Far)
+    {
+        m_verticalFOV = v_FOV;
+        m_PerspectiveNear = Near;
+        m_PerspectiveFar = Far;
 
-    class SceneCamera :public Camera {
-    public:
-        SceneCamera(float Width, float Height);
-        SceneCamera();
-        ~SceneCamera() = default;
+        RecalculateProjection();
+        RecalculateProjectionView();
+    }
+    void SceneCamera::SetCameraPosition(const glm::vec3& pos)
+    {
+        m_Position = pos; RecalculateProjectionView();
+    }
+    void SceneCamera::SetViewDirection(const glm::vec3& dir)
+    {
+        m_ViewDirection = dir; RecalculateProjectionView();
+    }
 
-        //no support for orthographic projection these are just place holders for future
-        void SetProjectionType(ProjectionTypes type) { m_projection_type = type; RecalculateProjection(); }
-        void SetOrthographic(float Size, float Near = -1.0f, float Far = 1.0f);
-        inline float GetOrthographicSize() { return m_OrthographicSize; }
-        inline float GetOrthographicNear() { return m_OrthographicNear; }
-        inline float GetOrthographicFar() { return m_OrthographicFar; }
-        void SetOrthographicSize(float size) { m_OrthographicSize = size; }
-        void SetOrthographicNear(float Near) { m_OrthographicNear = Near; RecalculateProjection(); }
-        void SetOrthographicFar(float Far) { m_OrthographicFar = Far; RecalculateProjection(); }
+    void SceneCamera::SetUPVector(const glm::vec3& up)
+    {
+        Up = up; RecalculateProjectionView();
+    }
+    void SceneCamera::SetViewportSize(float aspectratio)
+    {
+        m_AspectRatio = aspectratio;
+        RecalculateProjection();
+        RecalculateProjectionView();
+    }
+    glm::mat4 SceneCamera::GetProjectionView()
+    {
+        return m_ProjectionView;
+    }
+    inline glm::mat4 SceneCamera::GetViewMatrix()
+    {
+        return m_View;
+    }
+    inline glm::mat4 SceneCamera::GetProjectionMatrix()
+    {
+        return m_Projection;
+    }
+    inline glm::vec3 SceneCamera::GetCameraPosition()
+    {
+        return m_Position;
+    }
+    inline glm::vec3 SceneCamera::GetViewDirection()
+    {
+        return m_ViewDirection;
+    }
+    inline float SceneCamera::GetAspectRatio()
+    {
+        return m_AspectRatio;
+    }
+    inline float SceneCamera::GetVerticalFOV()
+    {
+        return m_verticalFOV;
+    }
+//    void SceneCamera::OnEvent(Event& e)
+//    {
+//
+//    }
 
-        virtual void SetPerspctive(float v_FOV, float Near, float Far) override;
-        virtual void SetCameraPosition(const glm::vec3& pos) override;
-        virtual void SetViewDirection(const glm::vec3& dir) override;
-        virtual void SetUPVector(const glm::vec3& up) override;
-        virtual void SetViewportSize(float aspectratio) override;
-        virtual void SetVerticalFOV(float fov) override { m_verticalFOV = fov; }
-        void SetPerspectiveNear(float val) override { m_PerspectiveNear = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
-        void SetPerspectiveFar(float val) override { m_PerspectiveFar = val; SetPerspctive(m_verticalFOV, m_PerspectiveNear, m_PerspectiveFar); }
+    void SceneCamera::OnUpdate()
+    {
+        RightVector = glm::cross(m_ViewDirection, Up);//we get the right vector (as it is always perpendicular to up and m_ViewDirection)
 
-        float GetPerspectiveNear() override { return m_PerspectiveNear; };
-        float GetPerspectiveFar() override { return m_PerspectiveFar; };
-        virtual glm::mat4 GetProjectionView() override;
-        virtual inline glm::mat4 GetViewMatrix() override;
-        virtual inline glm::mat4 GetProjectionMatrix() override;
-        virtual inline glm::vec3 GetCameraPosition() override;
-        inline glm::vec3 GetCameraRotation() override { return glm::vec3(m_pitch, m_yaw, m_roll); };
-        virtual inline glm::vec3 GetViewDirection() override;
-        virtual inline float GetAspectRatio() override;
-        virtual inline float GetVerticalFOV() override;
+        //RecalculateProjectionView();
+    }
 
-        virtual void OnEvent(Event& e) override;
-        virtual void OnUpdate(TimeStep ts) override;
-        virtual void RotateCamera(float pitch = 0, float yaw = 0, float roll = 0) override;
+    void SceneCamera::RotateCamera(float pitch , float yaw, float roll)
+    {
+        m_pitch = pitch;
+        m_yaw = yaw;
+        m_roll = roll;
+        //pitch = glm::clamp(pitch, -89.0f, 89.0f);
+        m_ViewDirection = glm::mat3(glm::rotate(glm::radians(yaw), Up)) * glm::mat3(glm::rotate(glm::radians(pitch), RightVector)) * glm::mat3(glm::rotate(glm::radians(roll), m_ViewDirection)) * glm::vec3(0, 0, 1);
+        RecalculateProjectionView();
+    }
 
-    public:
-        ProjectionTypes m_projection_type = ProjectionTypes::perspective;
-    private:
-        void RecalculateProjection();//for now it is orthographic projection
-        void RecalculateProjectionView();
-    private:
-        glm::mat4 m_Projection;
-        glm::mat4 m_View;
-        glm::mat4 m_ProjectionView;
+    void SceneCamera::SetOrthographic(float Size, float Near, float Far)
+    {
+        m_projection_type = ProjectionTypes::Orhtographic;
+        m_OrthographicSize = Size;
+        m_OrthographicNear = Near;
+        m_OrthographicFar = Far;
+        RecalculateProjection();
+    }
 
-        glm::vec3 m_Position = { 0,0,0 }, m_ViewDirection = { 0,0,1 };
-        //m_Viewdirection is the location we are looking at (it is the vector multiplied with rotation matrix)
-        glm::vec3 Up = { 0,1,0 }, RightVector;//we get right vector by getting the cross product of m_ViewDirection and Up vectors
-
-        float m_verticalFOV = 90.f;
-        float m_PerspectiveNear = 0.01;
-        float m_PerspectiveFar = 1000;
-
-        float m_AspectRatio = 1.0;
-        float m_pitch = 0, m_yaw = 0, m_roll = 0;
-        float m_OrthographicSize = 10.f;
-        float m_OrthographicFar = 1.f, m_OrthographicNear = -1.f;
-    };
+    void SceneCamera::RecalculateProjection()
+    {
+        switch (m_projection_type)
+        {
+        case ProjectionTypes::Orhtographic:
+        {
+            float left = -m_AspectRatio * m_OrthographicSize * 0.5;
+            float right = m_AspectRatio * m_OrthographicSize * 0.5;
+            float bottom = -m_OrthographicSize * 0.5;
+            float Up = m_OrthographicSize * 0.5;
+            m_Projection = glm::ortho(left, right, bottom, Up, m_OrthographicNear, m_OrthographicFar);
+            return;
+        }
+        case ProjectionTypes::perspective:
+            m_Projection = glm::perspective(glm::radians(m_verticalFOV), m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+            return;
+        }
+    }
+    void SceneCamera::RecalculateProjectionView()
+    {
+        //moving the camera is nothing but transforming the world
+        m_View = glm::lookAt(m_Position, glm::normalize(m_ViewDirection) + m_Position, Up);//this gives the view matrix
+        m_ProjectionView = m_Projection * m_View;
+    }
 }

@@ -44,10 +44,13 @@ public:
     VulkanBuffer();
     ~VulkanBuffer();
     inline VkBuffer* GetBuffer(){return &m_buffer;}
-    void CreateVertexBuffer(VkDevice& device, VmaAllocator& allocator);
-    inline void DestroyVertexBuffer(VmaAllocator& allocator) {vmaDestroyBuffer(allocator, m_buffer, m_allocation);}
+        inline VmaAllocation* GetAllocation() {return &m_allocation;}
+    void CreateBuffer(VkDevice& device, VmaAllocator& allocator, uint32_t size_in_bytes, VkBufferUsageFlags bufferUsageFlag, VmaMemoryUsage memoryUsage = VMA_MEMORY_USAGE_CPU_TO_GPU);
+    void CopyBuffer(VmaAllocator& allocator, void* buffer, uint32_t size_in_bytes);
+    inline void DestroyBuffer(VmaAllocator& allocator) {
+        vmaDestroyBuffer(allocator, m_buffer, m_allocation);
+    }
 private:
-    std::vector<Vertex> vertices;
     VkBuffer m_buffer;
     VmaAllocation m_allocation;
 };

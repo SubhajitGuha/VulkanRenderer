@@ -21,6 +21,20 @@ VkShaderModule VulkanPipeline::CreateShaderModule(VkDevice& device, const std::v
     return shaderModule;
 }
 
+void VulkanPipeline::CreatePipelineLayout(VkDevice& device, std::vector<VkDescriptorSetLayout> layouts)
+{
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(layouts.size());
+    pipelineLayoutInfo.pSetLayouts = layouts.data();
+    pipelineLayoutInfo.pushConstantRangeCount = 0;
+
+    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create pipeline layout!");
+    }
+}
+
 void VulkanPipeline::CreatePipeline(VkDevice& device, VkRenderPass& renderPass)
 {
     auto vertexShaderCode = Vulkan::ReadFile("/Users/avataar/Documents/vulkan_learning/RenderingEngine/Shaders/vert.spv");
@@ -103,16 +117,6 @@ void VulkanPipeline::CreatePipeline(VkDevice& device, VkRenderPass& renderPass)
             dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
             dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
             dynamicState.pDynamicStates = dynamicStates.data();
-
-            VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-            pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-            pipelineLayoutInfo.setLayoutCount = 0;
-            pipelineLayoutInfo.pushConstantRangeCount = 0;
-
-            if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
-            {
-                throw std::runtime_error("failed to create pipeline layout!");
-            }
 
             VkGraphicsPipelineCreateInfo pipelineInfo{};
             pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
