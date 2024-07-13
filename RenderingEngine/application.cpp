@@ -2,15 +2,20 @@
 #include "application.hpp"
 #include "Window/window.hpp"
 #include "glm/glm.hpp"
+#include <functional>
 
+#define BIND_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 using namespace Engine;
 
 Application::Application(){
+    m_window = std::make_shared<Window>("Vulkan Renderer", 1920, 1080);
+    m_window->SetCallbackEvent(BIND_FN(OnEvent));
     
     m_camera = Camera::GetCamera(CameraType::SCENE_CAMERA);
+    m_camera->SetViewportSize(1920/1080.0);
     m_camera->SetCameraPosition({0.0,0.0,-10});
-    vulkan_renderer = std::make_shared<Vulkan>();
-    vulkan_renderer->Init();
+    vulkan_renderer = std::make_shared<Vulkan>(m_window);
+
     
     m_numImages = vulkan_renderer->GetNumSwapChainImages();
     m_cmdBuffers.resize(m_numImages);
@@ -140,11 +145,20 @@ void Application::CreateDescriptorSets(VkDevice& m_device)
         vkUpdateDescriptorSets(m_device, 1, &writeSet, 0, nullptr);
     }
 }
+
+void Application::OnEvent(Event& e)
+{
+    EventDispatcher dispatch(e);
+    dispatch.Dispatch<WindowCloseEvent>([&](WindowCloseEvent close_event){
+        m_running = false;
+        return true;
+    });
+}
+
 void Application::Run(){
-    auto window = vulkan_renderer->GetWindow();
-    while(!window->is_windowClosd())
+    while(m_running)
     {
-        window->update();
+        m_window->update();
         m_camera->OnUpdate();
         uint32_t imgIndex = vulkan_renderer->AcquireNextImage();
         

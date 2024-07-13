@@ -10,6 +10,9 @@
 #include "VulkanAPI/vulkan_buffer.hpp"
 #include "VulkanAPI/vulkan_pipeline.hpp"
 #include "Camera/Camera.hpp"
+#include "Events/ApplicationEvent.h"
+#include "Window/window.hpp"
+#include "Events/ApplicationEvent.h"
 
 class Application{
 public:
@@ -17,6 +20,7 @@ public:
     ~Application();
     
     void Run();
+    void OnEvent(Engine::Event& e);
     void RecordCommandBuffer();
 private:
     void CreateDescriptorSets(VkDevice& m_device);
@@ -32,4 +36,7 @@ private:
     std::vector<VkCommandBuffer> m_cmdBuffers;
     std::vector<VkDescriptorSet> m_descriptorSets;
     std::shared_ptr<Engine::Camera> m_camera;
+    std::shared_ptr<Engine::Window> m_window;
+    
+    bool m_running = true;
 };

@@ -71,6 +71,11 @@
 		6F83ABC92C3FB3C200DEE087 /* SceneCamera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SceneCamera.hpp; sourceTree = "<group>"; };
 		6F83ABCE2C3FB4DA00DEE087 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		6F83ABCF2C3FB4DA00DEE087 /* Camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Camera.hpp; sourceTree = "<group>"; };
+		6F83ABD22C423B9100DEE087 /* ApplicationEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationEvent.h; sourceTree = "<group>"; };
+		6F83ABD32C423B9100DEE087 /* MouseEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MouseEvent.h; sourceTree = "<group>"; };
+		6F83ABD42C423B9100DEE087 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
+		6F83ABD52C423B9100DEE087 /* KeyEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyEvent.h; sourceTree = "<group>"; };
+		6F83ABD62C423DCA00DEE087 /* common_includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common_includes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +137,7 @@
 		6F45E1992BD54C050015A527 /* RenderingEngine */ = {
 			isa = PBXGroup;
 			children = (
+				6F83ABD12C423B7600DEE087 /* Events */,
 				6F83ABC72C3FA62B00DEE087 /* Camera */,
 				6F0548582C390D5100FE5F3A /* Shaders */,
 				6F6ACE832C1EC51900EFC8A4 /* Window */,
@@ -139,6 +145,7 @@
 				6F45E19A2BD54C050015A527 /* main.cpp */,
 				6F0548552C31C1B700FE5F3A /* application.cpp */,
 				6F0548562C31C1B700FE5F3A /* application.hpp */,
+				6F83ABD62C423DCA00DEE087 /* common_includes.h */,
 			);
 			path = RenderingEngine;
 			sourceTree = "<group>";
@@ -178,6 +185,17 @@
 				6F83ABCF2C3FB4DA00DEE087 /* Camera.hpp */,
 			);
 			path = Camera;
+			sourceTree = "<group>";
+		};
+		6F83ABD12C423B7600DEE087 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				6F83ABD22C423B9100DEE087 /* ApplicationEvent.h */,
+				6F83ABD42C423B9100DEE087 /* Event.h */,
+				6F83ABD52C423B9100DEE087 /* KeyEvent.h */,
+				6F83ABD32C423B9100DEE087 /* MouseEvent.h */,
+			);
+			path = Events;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

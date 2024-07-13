@@ -22,11 +22,9 @@ namespace Engine
 {
     class Vulkan{
     public:
-        Vulkan();
+        Vulkan(std::shared_ptr<Window>& window);
         ~Vulkan();
-        void Init();
-        void UpdateWindow();
-        inline std::shared_ptr<Window> GetWindow(){return window;}
+        void Init(std::shared_ptr<Window>& window);
         inline uint32_t GetNumSwapChainImages(){return m_images.size();}
         inline VkImage GetImage(uint32_t index){return m_images[index];}
         //Gives the swapchain Image Extent
@@ -53,8 +51,8 @@ namespace Engine
         void cleanup();
 
         void CreateInstance(std::vector<const char*>& extensions);
+        void CreateSurface(std::shared_ptr<Window>& window);
         void CreateDebugCallback();
-        void CreateSurface();
         void CreatePhysicalDevice();
         void CreateLogicalDevice();
         void CreateSwapChain();
@@ -95,7 +93,6 @@ namespace Engine
         std::vector<VkImageView> m_imageViews;
         VkDevice m_device;
         uint32_t m_queueFamilyIndex;
-        std::shared_ptr<Window> window;
         
         std::stack<std::function<void()>> m_deleationStack;
     };

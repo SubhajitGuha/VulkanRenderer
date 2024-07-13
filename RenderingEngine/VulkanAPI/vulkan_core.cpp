@@ -25,15 +25,13 @@ namespace Engine
 
         return VK_FALSE;  // The calling function should not be aborted
     }
-    Vulkan::Vulkan(){
-        
+    Vulkan::Vulkan(std::shared_ptr<Window>& window){
+        Init(window);
     }
     Vulkan::~Vulkan(){
         cleanup();
     }
-    void Vulkan::Init(){
-        window = std::make_shared<Engine::Window>();
-
+    void Vulkan::Init(std::shared_ptr<Window>& window){
         uint32_t extCount;
         std::vector<const char*> requiredExtensions;
         auto extensions = glfwGetRequiredInstanceExtensions(&extCount);
@@ -53,7 +51,7 @@ namespace Engine
         
         CreateInstance(requiredExtensions);
 //        CreateDebugCallback();
-        CreateSurface();
+        CreateSurface(window);
         CreatePhysicalDevice();
         CreateLogicalDevice();
         CreateMemoryAllocator();
@@ -176,7 +174,7 @@ namespace Engine
             printf("Debug utils messenger created\n");
     }
 
-    void Vulkan::CreateSurface()
+    void Vulkan::CreateSurface(std::shared_ptr<Window>& window)
     {
         auto result = glfwCreateWindowSurface(VulkanInstance, window->getWindow(), nullptr, &m_surface);
         if(result != VK_SUCCESS)
@@ -389,13 +387,6 @@ namespace Engine
         else
             std::cout<<"command buffer successfully created\n";
     }
-
-    void Vulkan::UpdateWindow(){
-       
-            window->update();
-        
-    }
-
     void Vulkan::BeginCommandBuffer(VkCommandBuffer buffer, VkCommandBufferUsageFlags usageFlags)
     {
         VkCommandBufferBeginInfo bufBeginInfo = {};
