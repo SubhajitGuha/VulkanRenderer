@@ -22,6 +22,7 @@
 		6F6ACE862C1EC54A00EFC8A4 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F6ACE842C1EC54A00EFC8A4 /* window.cpp */; };
 		6F83ABCA2C3FB3C200DEE087 /* SceneCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F83ABC82C3FB3C200DEE087 /* SceneCamera.cpp */; };
 		6F83ABD02C3FB4DA00DEE087 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F83ABCE2C3FB4DA00DEE087 /* Camera.cpp */; };
+		6F83ABD92C42583A00DEE087 /* WindowInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F83ABD72C42583A00DEE087 /* WindowInput.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -76,6 +77,10 @@
 		6F83ABD42C423B9100DEE087 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
 		6F83ABD52C423B9100DEE087 /* KeyEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyEvent.h; sourceTree = "<group>"; };
 		6F83ABD62C423DCA00DEE087 /* common_includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common_includes.h; sourceTree = "<group>"; };
+		6F83ABD72C42583A00DEE087 /* WindowInput.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WindowInput.cpp; sourceTree = "<group>"; };
+		6F83ABD82C42583A00DEE087 /* WindowInput.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WindowInput.hpp; sourceTree = "<group>"; };
+		6F83ABDA2C42587C00DEE087 /* Input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
+		6F83ABDB2C425BB700DEE087 /* VulkanRendererCodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VulkanRendererCodes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +151,8 @@
 				6F0548552C31C1B700FE5F3A /* application.cpp */,
 				6F0548562C31C1B700FE5F3A /* application.hpp */,
 				6F83ABD62C423DCA00DEE087 /* common_includes.h */,
+				6F83ABDA2C42587C00DEE087 /* Input.h */,
+				6F83ABDB2C425BB700DEE087 /* VulkanRendererCodes.h */,
 			);
 			path = RenderingEngine;
 			sourceTree = "<group>";
@@ -172,6 +179,8 @@
 			children = (
 				6F6ACE842C1EC54A00EFC8A4 /* window.cpp */,
 				6F6ACE852C1EC54A00EFC8A4 /* window.hpp */,
+				6F83ABD72C42583A00DEE087 /* WindowInput.cpp */,
+				6F83ABD82C42583A00DEE087 /* WindowInput.hpp */,
 			);
 			path = Window;
 			sourceTree = "<group>";
@@ -257,6 +266,7 @@
 			files = (
 				6F0548642C3ACF8E00FE5F3A /* vulkan_buffer.cpp in Sources */,
 				6F6ACE862C1EC54A00EFC8A4 /* window.cpp in Sources */,
+				6F83ABD92C42583A00DEE087 /* WindowInput.cpp in Sources */,
 				6F45E19B2BD54C050015A527 /* main.cpp in Sources */,
 				6F0548602C39234600FE5F3A /* vulkan_pipeline.cpp in Sources */,
 				6F83ABD02C3FB4DA00DEE087 /* Camera.cpp in Sources */,

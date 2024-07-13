@@ -22,6 +22,8 @@ public:
     void Run();
     void OnEvent(Engine::Event& e);
     void RecordCommandBuffer();
+    std::shared_ptr<Engine::Window> GetWindow(){return m_window;}
+    static Application* Get(){return getApplication;}
 private:
     void CreateDescriptorSets(VkDevice& m_device);
 private:
@@ -37,6 +39,6 @@ private:
     std::vector<VkDescriptorSet> m_descriptorSets;
     std::shared_ptr<Engine::Camera> m_camera;
     std::shared_ptr<Engine::Window> m_window;
-    
+    static Application* getApplication;
     bool m_running = true;
 };

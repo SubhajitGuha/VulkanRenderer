@@ -1,5 +1,7 @@
 #pragma once
 #include "Camera.hpp"
+#include "../Input.h"
+#include "../VulkanRendererCodes.h"
 
 namespace Engine {
     enum ProjectionTypes {
@@ -68,5 +70,9 @@ namespace Engine {
         float m_pitch = 0, m_yaw = 0, m_roll = 0;
         float m_OrthographicSize = 10.f;
         float m_OrthographicFar = 1.f, m_OrthographicNear = -1.f;
+        
+        //camera parameters
+        float m_movespeed = 30;
+        glm::vec2 OldMousePos = { 0,0};
     };
 }

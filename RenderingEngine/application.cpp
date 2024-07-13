@@ -5,9 +5,13 @@
 #include <functional>
 
 #define BIND_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
 using namespace Engine;
 
+Application* Application::getApplication;
+
 Application::Application(){
+    getApplication = this;
     m_window = std::make_shared<Window>("Vulkan Renderer", 1920, 1080);
     m_window->SetCallbackEvent(BIND_FN(OnEvent));
     
